@@ -1,2 +1,2 @@
 # C-Program
-C/Cpp program wrote in college
+C/Cpp program written in college
