@@ -28,32 +28,13 @@
 
 
 bool snakeaddFlag = FALSE; //蛇身长度增加标志
-
 int SPEED = 500;           //蛇移动速度，初始为 500， 越低越快
 int SNAKELENTH = 2;		   //蛇身长度，初始为2
 char OLDDIRECTION = LEFT;  //蛇原始运动方向，初始运动方向为 LEFT
 char DIRECTION;            //蛇新运动方向
 
+struct snake_head_position HEAD = { 60, 20 }; //储存蛇头坐标，蛇头初始坐标为 {x = 60, y = 20}
 
-struct snake_head_position HEAD = { 60, 20 };
-
-
-//*****************打印蛇*****************
-void snake_born_print()
-{
-	//goto_XY(HEAD.x + 1, HEAD.y);
-	//printf("*");
-	//goto_XY(HEAD.x + 2, HEAD.y);
-	//printf("*");
-
-	for (int i = 1; i <= SNAKELENTH; i++)
-	{
-		goto_XY(HEAD.x + i, HEAD.y);
-		printf("*");
-
-	}
-
-}
 
 //*****************蛇头向左运动*****************
 void snake_move_left()
@@ -76,10 +57,11 @@ void snake_move_left()
 //*****************蛇头向左转向*****************
 void snake_turn_left()
 {
+	//原始方向为上
 	if (OLDDIRECTION == UP)
 	{
 		//转向第一帧
-		goto_XY(HEAD.x, HEAD.y);
+		goto_XY(HEAD.x, HEAD.y); 
 		STARP;
 		goto_XY(HEAD.x, HEAD.y + SNAKELENTH);
 		SPACEP;
@@ -87,10 +69,7 @@ void snake_turn_left()
 		goto_XY(HEAD.x, HEAD.y);
 		ATP;
 
-		snake_eat_food();
-
-		
-
+		snake_eat_food(); //判断蛇头吃到食物，避免蛇头覆盖食物
 
 		Sleep(100);
 
@@ -105,11 +84,13 @@ void snake_turn_left()
 			goto_XY(HEAD.x + j, HEAD.y + (SNAKELENTH - i));
 			SPACEP;
 
-			if(i != SNAKELENTH - 1) Sleep(100);
+			if(i != SNAKELENTH - 1) Sleep(100); //除了最后1帧结束时，延时
+
 		}
 
 	}
 
+	//原始方向为下
 	else if (OLDDIRECTION == DOWN)
 	{
 		//转向第一帧
@@ -121,7 +102,7 @@ void snake_turn_left()
 		goto_XY(HEAD.x, HEAD.y);
 		ATP;
 
-		snake_eat_food();
+		snake_eat_food(); //判断蛇头吃到食物，避免蛇头覆盖食物
 
 		Sleep(SPEED);
 
@@ -137,6 +118,7 @@ void snake_turn_left()
 			SPACEP;
 
 			if (i != SNAKELENTH - 1) Sleep(SPEED);
+
 		}
 
 	}
@@ -175,7 +157,7 @@ void snake_turn_right()
 		goto_XY(HEAD.x, HEAD.y);
 		ATP;
 
-		snake_eat_food();
+		snake_eat_food(); //判断蛇头吃到食物，避免蛇头覆盖食物
 
 		Sleep(100);
 
@@ -191,6 +173,7 @@ void snake_turn_right()
 			SPACEP;
 
 			if (i != SNAKELENTH - 1) Sleep(100);
+
 		}
 
 	}
@@ -206,7 +189,7 @@ void snake_turn_right()
 		goto_XY(HEAD.x, HEAD.y);
 		ATP;
 
-		snake_eat_food();
+		snake_eat_food(); //判断蛇头吃到食物，避免蛇头覆盖食物
 
 		Sleep(SPEED);
 
@@ -222,6 +205,7 @@ void snake_turn_right()
 			SPACEP;
 
 			if (i != SNAKELENTH - 1) Sleep(SPEED);
+
 		}
 
 	}
@@ -260,7 +244,7 @@ void snake_turn_up()
 		goto_XY(HEAD.x, HEAD.y);
 		ATP;
 
-		snake_eat_food();
+		snake_eat_food(); //判断蛇头吃到食物，避免蛇头覆盖食物
 
 		Sleep(100);
 
@@ -276,6 +260,7 @@ void snake_turn_up()
 			SPACEP;
 
 			if (i != SNAKELENTH - 1) Sleep(100);
+
 		}
 
 	}
@@ -291,7 +276,7 @@ void snake_turn_up()
 		goto_XY(HEAD.x, HEAD.y);
 		ATP;
 
-		snake_eat_food();
+		snake_eat_food(); //判断蛇头吃到食物，避免蛇头覆盖食物
 
 		Sleep(SPEED);
 
@@ -307,6 +292,7 @@ void snake_turn_up()
 			SPACEP;
 
 			if (i != SNAKELENTH - 1) Sleep(SPEED);
+
 		}
 
 	}
@@ -344,7 +330,7 @@ void snake_turn_down()
 		goto_XY(HEAD.x, HEAD.y);
 		ATP;
 		
-		snake_eat_food();
+		snake_eat_food(); //判断蛇头吃到食物，避免蛇头覆盖食物
 
 		Sleep(100);
 
@@ -360,8 +346,8 @@ void snake_turn_down()
 			SPACEP;
 
 			if (i != SNAKELENTH - 1) Sleep(100);
-		}
 
+		}
 
 	}
 
@@ -376,7 +362,7 @@ void snake_turn_down()
 		goto_XY(HEAD.x, HEAD.y);
 		ATP;
 		
-		snake_eat_food();
+		snake_eat_food(); //判断蛇头吃到食物，避免蛇头覆盖食物
 
 		Sleep(SPEED);
 
@@ -392,6 +378,7 @@ void snake_turn_down()
 			SPACEP;
 
 			if (i != SNAKELENTH - 1) Sleep(SPEED);
+
 		}
 
 	}
@@ -419,14 +406,16 @@ void snake_move_direction()
 		case RIGHT:
 			snake_move_right();
 			break;
+
 	}
+
 }
 
 //*****************蛇头转向方向*****************
 void snake_turn_direction()
 {
-	//firstFlag = FALSE;
 	DIRECTION = _getch();
+	
 	switch (DIRECTION)
 	{
 		case UP:
@@ -434,12 +423,12 @@ void snake_turn_direction()
 			if (OLDDIRECTION == LEFT || OLDDIRECTION == RIGHT)
 			{
 				snake_turn_up();
-				//snake_move_up();
-
+				
 			}
 			else
 			{
 				break;
+
 			}
 
 			break;
@@ -449,11 +438,12 @@ void snake_turn_direction()
 			if (OLDDIRECTION == LEFT || OLDDIRECTION == RIGHT)
 			{
 				snake_turn_down();
-				//snake_move_down();
+				
 			}
 			else
 			{
 				break;
+
 			}
 
 			break;
@@ -463,11 +453,12 @@ void snake_turn_direction()
 			if (OLDDIRECTION == UP || OLDDIRECTION == DOWN)
 			{
 				snake_turn_left();
-				//snake_move_left();
+				
 			}
 			else
 			{
 				break;
+
 			}
 
 			break;
@@ -477,21 +468,23 @@ void snake_turn_direction()
 			if (OLDDIRECTION == UP || OLDDIRECTION == DOWN)
 			{
 				snake_turn_right();
-				//snake_move_right();
+				
 			}
 			else
 			{
 				break;
+
 			}
 
 			break;
 
 		default:
 			break;
+
 	}
 
-	OLDDIRECTION = DIRECTION;
-	DIRECTION = NULL;
+	OLDDIRECTION = DIRECTION; //将新的方向给 OLDDIRECTION
+	DIRECTION = NULL;         //DIRECTION 归零
 
 }
 
@@ -534,23 +527,24 @@ void snake_lenth_add()
 }
 
 
-
-
-
 //*****************跳转光标至指定位置*****************
 void goto_XY(int x, int y)
 {
 	// 更新光标位置 
 	COORD pos;
 	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+
 	pos.X = x;
 	pos.Y = y;
 	SetConsoleCursorPosition(hOutput, pos);
+	
 	// 隐藏光标 
 	CONSOLE_CURSOR_INFO cursor;
 	cursor.bVisible = FALSE;
+
 	cursor.dwSize = sizeof(cursor);
 	SetConsoleCursorInfo(hOutput, &cursor);
+
 }
 
 
