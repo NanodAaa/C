@@ -1,0 +1,364 @@
+C51 COMPILER V9.60.0.0   LCD1602                                                           04/08/2022 11:19:52 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE LCD1602
+OBJECT MODULE PLACED IN .\Objects\LCD1602.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE LCD1602.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\L
+                    -CD1602.lst) OBJECT(.\Objects\LCD1602.obj)
+
+line level    source
+
+   1          /*
+   2                                          LCD1602相关函数
+   3          */
+   4          
+   5          
+   6          #include "intrins.h"
+   7          #include "Electric CLock.h"
+   8          #include "main.h"
+   9          #include "reg51.h"
+  10          
+  11          #define DATA P0 //LCD1602数据输入/输出
+  12          
+  13          bit Moveflag;
+  14          
+  15          //LCD1602
+  16          sbit W_R = P2^5; 
+  17          sbit RS = P2^6;
+  18          sbit E = P2^7;
+  19          
+  20          //独立按键
+  21          sbit K1 = P3^1;
+  22          sbit K2 = P3^0;
+  23          sbit K3 = P3^2;
+  24          sbit K4 = P3^3;
+  25          
+  26          unsigned char i = 0x30; //
+  27          unsigned char j;
+  28          
+  29          extern bit Keyflag0;
+  30          
+  31          //检测繁忙
+  32          unsigned char lcd1602_check_busy()
+  33          {
+  34   1              unsigned char ucData;
+  35   1              RS = 0;
+  36   1              W_R = 1;
+  37   1              DelayUs(10);
+  38   1              E = 0;
+  39   1              DelayUs(10);
+  40   1              E = 1;
+  41   1              DelayUs(10);            //模式设为读取忙标志
+  42   1              ucData = DATA;
+  43   1              //返回“1”意味繁忙，返回“0”意味空闲
+  44   1              
+  45   1              return (DATA&0x80); // 1表示忙，0表示空闲
+  46   1      }
+  47          
+  48          //写入指令
+  49          void write_lcd1602_command(unsigned char com)
+  50          {
+  51   1              while(lcd1602_check_busy()); //空闲时执行写入命令
+  52   1              
+  53   1              RS = 0;
+  54   1              W_R = 0; //模式设为写入命令
+C51 COMPILER V9.60.0.0   LCD1602                                                           04/08/2022 11:19:52 PAGE 2   
+
+  55   1              E = 1;   //允许写入指令
+  56   1              DelayUs(10);
+  57   1              
+  58   1              DATA = com; //向lcd1602写入命令
+  59   1              
+  60   1              DelayUs(10);
+  61   1              E = 0;
+  62   1              DelayUs(5);
+  63   1      }
+  64          
+  65          //从lcd1602中读取数据
+  66          unsigned char read_lcd1602_data()
+  67          {
+  68   1              unsigned char dat;
+  69   1              while(lcd1602_check_busy());
+  70   1              
+  71   1              RS = 1;  //选中数据寄存器
+  72   1              W_R = 1; //设为读信息
+  73   1              E = 1;   //允许读信息
+  74   1              DelayMs(5);
+  75   1              
+  76   1              dat = DATA; //从lcd1602读取数据
+  77   1              
+  78   1              return dat; //返回读取的数据 dat
+  79   1      }
+  80          
+  81          //读取字符
+  82          unsigned char read_lcd1602_char(unsigned char hang, unsigned char lie)
+  83          {
+  84   1              unsigned char dat;
+  85   1              
+  86   1              //设定显示的位置：第1行，及列数
+  87   1              if(hang == 0)
+  88   1              {
+  89   2                      write_lcd1602_command(0x80 + lie);
+  90   2              }
+  91   1              //设定显示的位置：第2行，及列数
+  92   1              else if(hang == 1)
+  93   1              {
+  94   2                      write_lcd1602_command(0xc0 + lie);
+  95   2              }
+  96   1              
+  97   1              //从lcd1602读取数据
+  98   1              dat = read_lcd1602_data();
+  99   1              
+ 100   1              return dat; //返回读取的字符dat
+ 101   1      }
+ 102          
+ 103          //写入数据
+ 104          void write_lcd1602_data(unsigned char dat)
+ 105          {
+ 106   1              while(lcd1602_check_busy()); //空闲时执行写入命令
+ 107   1              
+ 108   1              RS = 1;
+ 109   1              W_R = 0;
+ 110   1              E = 1;
+ 111   1              DelayUs(10);
+ 112   1              
+ 113   1              DATA = dat; //输入数据
+ 114   1              
+ 115   1              DelayUs(10);
+ 116   1              E = 0;
+C51 COMPILER V9.60.0.0   LCD1602                                                           04/08/2022 11:19:52 PAGE 3   
+
+ 117   1              DelayUs(10);
+ 118   1      }
+ 119          
+ 120          //写入字符                                      行                                      列                              字符
+ 121          void lcd1602_write_char(unsigned char Hang, unsigned char Lie, unsigned char n)
+ 122          {
+ 123   1              //设定显示的位置：第1行，及列数
+ 124   1              if(Hang == 0)
+ 125   1              {
+ 126   2                      write_lcd1602_command(0x80 + Lie); //设定显示的位置
+ 127   2              }
+ 128   1              //设定显示的位置：第2行，及列数
+ 129   1              else
+ 130   1              {
+ 131   2                      write_lcd1602_command(0xC0 + Lie);
+ 132   2              }
+ 133   1              
+ 134   1              //向lcd1602写入字符
+ 135   1              write_lcd1602_data(n); //写入字符'n'的ASCII
+ 136   1              
+ 137   1      }
+ 138          
+ 139          //写入字符串
+ 140          void lcd1602_write_string(unsigned char Hang1, unsigned char Lie1, unsigned char *s)
+ 141          {
+ 142   1              //设定显示的位置：第1行，及列数
+ 143   1              if(Hang1 == 0)
+ 144   1              {
+ 145   2                      write_lcd1602_command(0x80 + Lie1); 
+ 146   2              }
+ 147   1              //设定显示的位置：第2行，及列数
+ 148   1              else
+ 149   1              {
+ 150   2                      write_lcd1602_command(0xC0 + Lie1);
+ 151   2              }
+ 152   1              
+ 153   1              //向lcd1602输入字符串
+ 154   1              while(*s)
+ 155   1              {
+ 156   2                      write_lcd1602_data(*s);
+ 157   2                      s++;
+ 158   2              }
+ 159   1              
+ 160   1      }
+ 161          
+ 162          //清屏
+ 163          void lcd1602_clear()
+ 164          {
+ 165   1              write_lcd1602_command(0x01);
+ 166   1              DelayMs(5);
+ 167   1      }
+ 168          
+ 169          //按要求初始化
+ 170          void lcd1602_init()
+ 171          {
+ 172   1              write_lcd1602_command(0x38); //功能：8位总线、2行显示、5*7点阵
+ 173   1              DelayMs(5);
+ 174   1              write_lcd1602_command(0x08); //功能：显示屏关显示、不显示光标、光标闪烁
+ 175   1              write_lcd1602_command(0x01); //清屏
+ 176   1              write_lcd1602_command(0x06); //功能：输入数据时光标右移、输入字符时显示屏全部显示不移动
+ 177   1              DelayMs(5);
+ 178   1              write_lcd1602_command(0x0c); //显示屏开显示、不显示光标、光标闪烁
+C51 COMPILER V9.60.0.0   LCD1602                                                           04/08/2022 11:19:52 PAGE 4   
+
+ 179   1      }
+ 180          
+ 181          //闹钟设置初始化命令
+ 182          void lcd1602_alarm_init()
+ 183          {
+ 184   1              write_lcd1602_command(0x0f); //显示屏开显示、显示光标、光标闪烁
+ 185   1      }       
+ 186          
+ 187          //光标移动指令
+ 188          void lcd1602_course_move()
+ 189          {
+ 190   1              //光标左移
+ 191   1              if(K1 == 0)
+ 192   1              {
+ 193   2                      DelayMs(10);
+ 194   2                      if(K1 == 0)
+ 195   2                      {
+ 196   3                              while(K1 == 0);
+ 197   3                                                                              
+ 198   3                              j++;
+ 199   3                              
+ 200   3                              //跳过':'
+ 201   3                              if(j == 2)
+ 202   3                              {
+ 203   4                                      write_lcd1602_command(0x10);
+ 204   4                              }                       
+ 205   3                              else if(j == 4)
+ 206   3                              {
+ 207   4                                      write_lcd1602_command(0x10);
+ 208   4                              }
+ 209   3                              
+ 210   3                              //将光标跳到第1行最右
+ 211   3                              else if(j == 6)
+ 212   3                              {
+ 213   4                                      write_lcd1602_command(0x02); //光标归位
+ 214   4                                      DelayMs(5);
+ 215   4                                      
+ 216   4                                      write_lcd1602_command(0x14);
+ 217   4                                      DelayUs(5);
+ 218   4                                      write_lcd1602_command(0x14);
+ 219   4                                      DelayUs(5);
+ 220   4                                      write_lcd1602_command(0x14);
+ 221   4                                      DelayUs(5);
+ 222   4                                      write_lcd1602_command(0x14);
+ 223   4                                      DelayUs(5);
+ 224   4                                      write_lcd1602_command(0x14);
+ 225   4                                      DelayUs(5);
+ 226   4                                      write_lcd1602_command(0x14);
+ 227   4                                      DelayUs(5);
+ 228   4                                      write_lcd1602_command(0x14);
+ 229   4                                      DelayUs(5);
+ 230   4                                      write_lcd1602_command(0x14);
+ 231   4                                      DelayUs(5);
+ 232   4                                      write_lcd1602_command(0x14);
+ 233   4                                      DelayUs(5);
+ 234   4                                      write_lcd1602_command(0x14);
+ 235   4                                      DelayUs(5);
+ 236   4                                      write_lcd1602_command(0x14);
+ 237   4                                      DelayUs(5);
+ 238   4                                      write_lcd1602_command(0x14);
+ 239   4                                      DelayUs(5);
+ 240   4                                      write_lcd1602_command(0x14);
+C51 COMPILER V9.60.0.0   LCD1602                                                           04/08/2022 11:19:52 PAGE 5   
+
+ 241   4                                      DelayUs(5);
+ 242   4                                      write_lcd1602_command(0x14);
+ 243   4                                      DelayUs(5);
+ 244   4                                      write_lcd1602_command(0x14);
+ 245   4                                      DelayUs(5);
+ 246   4                                      write_lcd1602_command(0x14);
+ 247   4                                      DelayUs(5);
+ 248   4                                      //write_lcd1602_command(0x14);
+ 249   4                                      //DelayUs(5);
+ 250   4                                      //write_lcd1602_command(0x14);
+ 251   4                                      //DelayUs(5);
+ 252   4                                      //write_lcd1602_command(0x14);
+ 253   4                                      
+ 254   4                              }
+ 255   3                              
+ 256   3                              else if(j == 8)
+ 257   3                              {
+ 258   4                                      write_lcd1602_command(0x10);
+ 259   4                              }
+ 260   3                              else if(j == 10)
+ 261   3                              {
+ 262   4                                      write_lcd1602_command(0x10);
+ 263   4                              }
+ 264   3                              
+ 265   3                              else if(j == 14)
+ 266   3                              {
+ 267   4                                      j = 0;
+ 268   4                                      
+ 269   4                                      lcd1602_write_char(1, 15, '0');
+ 270   4                              }
+ 271   3                              
+ 272   3                              if(K3 == 0)
+ 273   3                              {
+ 274   4                                      DelayMs(5);
+ 275   4                                      if(K3 == 0)
+ 276   4                                      {
+ 277   5                                              while(K3 == 0);
+ 278   5                                              
+ 279   5                                              j = 0;
+ 280   5                                      }
+ 281   4                              }
+ 282   3                              
+ 283   3                              if(Keyflag0 == 0)
+ 284   3                              {
+ 285   4                                      j = 0;
+ 286   4                              }
+ 287   3                              
+ 288   3                              Moveflag = 1; //向改变lcd1602中发送flag，清零i
+ 289   3                              write_lcd1602_command(0x10); //左移
+ 290   3                      }       
+ 291   2              }
+ 292   1      }
+ 293          
+ 294          //改变lcd1602屏幕数字
+ 295          void lcd1602_change_number()
+ 296          {       
+ 297   1              //按下K2当前位置数字 +1
+ 298   1              if(K2 == 0)
+ 299   1              {
+ 300   2                      DelayMs(10);
+ 301   2                      if(K2 == 0)
+ 302   2                      {
+C51 COMPILER V9.60.0.0   LCD1602                                                           04/08/2022 11:19:52 PAGE 6   
+
+ 303   3                              while(K2 == 0);
+ 304   3                                              
+ 305   3                              write_lcd1602_data(i); //向lcd1602中写入 i 的值  
+ 306   3                              write_lcd1602_command(0x10); //写入后左移1位
+ 307   3                              
+ 308   3                              i++;
+ 309   3                      }
+ 310   2              }
+ 311   1                      
+ 312   1              //按下K1 光标左移时i重置
+ 313   1              if(Moveflag == 1)
+ 314   1              {
+ 315   2                      i = 0x30;
+ 316   2                      Moveflag = 0;
+ 317   2              }
+ 318   1              
+ 319   1              //i=10时i重置
+ 320   1              else if(i == 0x3a)
+ 321   1              {
+ 322   2                      i = 0x30;
+ 323   2              }
+ 324   1              
+ 325   1              //按下K4 退出屏幕三时重置i
+ 326   1              else if(K4 == 0)
+ 327   1              {
+ 328   2                      i = 0x30;
+ 329   2              }
+ 330   1      }       
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    620    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2      11
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
