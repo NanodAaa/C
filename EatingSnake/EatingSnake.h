@@ -22,14 +22,10 @@ struct snake_food_position
 };
 
 //*********************声明函数*********************
-//光标跳转
-void goto_XY(int x, int y);
-//开始界面
-void screen_START();
-//结束界面
-void screen_END();
-//游戏界面
-void screen_PLAY();
+void goto_XY(int x, int y);	//光标跳转
+void screen_START();	//开始界面
+void screen_END();	//结束界面
+void screen_PLAY();	//游戏界面
 void snake_turn_direction();
 void snake_move_down();
 void snake_move_left();
