@@ -1,12 +1,10 @@
 //******************************************
 //		
-//		Éß»ùÓÚ·½ÏòµÄÒÆ¶¯¼°ÉßµÄ´òÓ¡
-//			·½°¸2¸ü¶àµÄ×ªÏòÊ±»ú
-//			×ªÏòÊ±¿ÉÒÔ×ªÏò
+//		è›‡åŸºäºæ–¹å‘çš„ç§»åŠ¨åŠè›‡çš„æ‰“å°
+//			æ–¹æ¡ˆ2æ›´å¤šçš„è½¬å‘æ—¶æœº
+//			è½¬å‘æ—¶å¯ä»¥è½¬å‘
 //
 //******************************************
-
-
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -16,163 +14,126 @@
 #include "EatingSnake.h"
 #include "conio.h"
 
-//¿ØÖÆ·½Ïò¼ü
+//æ§åˆ¶æ–¹å‘é”®
 #define UP 'w'
 #define LEFT 'a'
 #define RIGHT 'd'
 #define DOWN 's'
 
-#define SPACEP printf(" "); //´òÓ¡¿Õ¸ñ
-#define STARP  printf("*"); //´òÓ¡ÉßÉí
-#define ATP    printf("@"); //´òÓ¡ÉßÍ·
-#define BLOCKP printf("¡ö"); //´òÓ¡·½¿é
+#define SPACEP printf(" "); //æ‰“å°ç©ºæ ¼
+#define STARP  printf("*"); //æ‰“å°è›‡èº«
+#define ATP    printf("@"); //æ‰“å°è›‡å¤´
+#define BLOCKP printf("â– "); //æ‰“å°æ–¹å—
 
 #define LEN sizeof(struct SNAKE)
 
+bool snakeaddFlag = FALSE; //è›‡èº«é•¿åº¦å¢åŠ æ ‡å¿—
+int SPEED = 500;           //è›‡ç§»åŠ¨é€Ÿåº¦ï¼Œåˆå§‹ä¸º 500ï¼Œ è¶Šä½è¶Šå¿«
+int SNAKELENTH = 2;		   //è›‡èº«é•¿åº¦ï¼Œåˆå§‹ä¸º2
+int LISTLENTH = 0;		   //é“¾è¡¨é•¿åº¦ï¼Œåˆå§‹ä¸º0
+char OLDDIRECTION = LEFT;  //è›‡åŸå§‹è¿åŠ¨æ–¹å‘ï¼Œåˆå§‹è¿åŠ¨æ–¹å‘ä¸º LEFT
+char DIRECTION;            //è›‡æ–°è¿åŠ¨æ–¹å‘
 
-bool snakeaddFlag = FALSE; //ÉßÉí³¤¶ÈÔö¼Ó±êÖ¾
-int SPEED = 500;           //ÉßÒÆ¶¯ËÙ¶È£¬³õÊ¼Îª 500£¬ Ô½µÍÔ½¿ì
-int SNAKELENTH = 2;		   //ÉßÉí³¤¶È£¬³õÊ¼Îª2
-int LISTLENTH = 0;		   //Á´±í³¤¶È£¬³õÊ¼Îª0
-char OLDDIRECTION = LEFT;  //ÉßÔ­Ê¼ÔË¶¯·½Ïò£¬³õÊ¼ÔË¶¯·½ÏòÎª LEFT
-char DIRECTION;            //ÉßĞÂÔË¶¯·½Ïò
+//struct snake_head_position HEAD = { 60, 20 }; //å‚¨å­˜è›‡å¤´åæ ‡ï¼Œè›‡å¤´åˆå§‹åæ ‡ä¸º {x = 60, y = 20}
 
-//struct snake_head_position HEAD = { 60, 20 }; //´¢´æÉßÍ·×ø±ê£¬ÉßÍ·³õÊ¼×ø±êÎª {x = 60, y = 20}
-
-
-//¶¯Ì¬Á´±í´¢´æÉßµÄÎ»ÖÃ×ø±ê
+//åŠ¨æ€é“¾è¡¨å‚¨å­˜è›‡çš„ä½ç½®åæ ‡
 struct SNAKE
 {
 	int x;
 	int y;
-	struct SNAKE* next; //Ö¸ÏòÏÂÒ»¸ö½ÚµãµÄÖ¸Õë
+	struct SNAKE* next; //æŒ‡å‘ä¸‹ä¸€ä¸ªèŠ‚ç‚¹çš„æŒ‡é’ˆ
 };
 
 struct SNAKE* HEAD;
 struct SNAKE* PT1;
 struct SNAKE* PT2;
 
-
-
-//´´½¨ÉßÉßÍ·¼°ÉíÌå¶¯Ì¬Á´±í
+//åˆ›å»ºè›‡è›‡å¤´åŠèº«ä½“åŠ¨æ€é“¾è¡¨
 struct SNAKE* snake_creat()
 {
-
-	//´´½¨Í·µÄ½Úµã
+	//åˆ›å»ºå¤´çš„èŠ‚ç‚¹
 	if (HEAD == NULL)
 	{
 		PT1 = PT2 = (struct SNAKE*)malloc(LEN);
-		//¼ì²âÄÚ´æ·ÖÅäÊÇ·ñ³É¹¦
+		//æ£€æµ‹å†…å­˜åˆ†é…æ˜¯å¦æˆåŠŸ
 		if (PT1 == NULL || PT2 == NULL)
 		{
-			printf("´´½¨ÉßÉßÉíÌåÊ§°Ü£¡\n");
-
+			printf("åˆ›å»ºè›‡è›‡èº«ä½“å¤±è´¥ï¼\n");
 			return NULL;
-
 		}
 
 		PT1->x = 60;
 		PT2->y = 20;
-
 	}
 
-	//¸ù¾İÉßÉí³¤¶ÈÔö¼Ó½Úµã
+	//æ ¹æ®è›‡èº«é•¿åº¦å¢åŠ èŠ‚ç‚¹
 	while (LISTLENTH != SNAKELENTH)
 	{
-		//°ÑÉßÍ·µÄ½Úµã¸øµ½Í·½áµã
-		if (LISTLENTH == 0)
-		{
-			HEAD = PT1; //Í·½áµã¸ø HEAD
-		}
-		else
-		{
-			PT2->next = PT1; //Á¬½ÓÇ°ºó½Úµã
+		//æŠŠè›‡å¤´çš„èŠ‚ç‚¹ç»™åˆ°å¤´ç»“ç‚¹
+		if (LISTLENTH == 0){
+			HEAD = PT1; //å¤´ç»“ç‚¹ç»™ HEAD
+		}else{
+			PT2->next = PT1; //è¿æ¥å‰åèŠ‚ç‚¹
 		}
 
-		PT2 = PT1; //PT1 ¸øµ½ PT2
+		PT2 = PT1; //PT1 ç»™åˆ° PT2
 
 		PT1 = (struct SNAKE*)malloc(LEN);
-		//¼ì²âÄÚ´æ·ÖÅäÊÇ·ñ³É¹¦
+		//æ£€æµ‹å†…å­˜åˆ†é…æ˜¯å¦æˆåŠŸ
 		if (PT1 == NULL || PT2 == NULL)
 		{
-			printf("´´½¨ÉßÉßÉíÌåÊ§°Ü£¡\n");
-
+			printf("åˆ›å»ºè›‡è›‡èº«ä½“å¤±è´¥ï¼\n");
 			return NULL;
-
 		}
 
-		//¸ù¾İÔ­Ê¼·½ÏòÎªĞÂ½Úµã¸³Óè×ø±ê
+		//æ ¹æ®åŸå§‹æ–¹å‘ä¸ºæ–°èŠ‚ç‚¹èµ‹äºˆåæ ‡
 		switch (OLDDIRECTION)
 		{
 			case UP:
 				PT1->x = PT2->x;
 				PT2->y = PT2->y - 1;
-
 				break;
 
 			case DOWN:
 				PT1->x = PT2->x;
 				PT2->y = PT2->y + 1;
-
 				break;
-
 
 			case LEFT:
 				PT1->x = PT2->x - 1;
 				PT2->y = PT2->y;
-
 				break;
-
 
 			case RIGHT:
 				PT1->x = PT2->x + 1;
 				PT2->y = PT2->y;
-
 				break;
-
 		}
-
-		LISTLENTH++; 
-
+		LISTLENTH++;
 	}
-
-	PT2->next = PT1; //Á¬½Ó×îºóÒ»¸ö½Úµã
-	 
+	PT2->next = PT1; //è¿æ¥æœ€åä¸€ä¸ªèŠ‚ç‚¹	 
 	return HEAD;
-
 }
 
 
-//ÉßÏò×óÔË¶¯º¯Êı
+//è›‡å‘å·¦è¿åŠ¨å‡½æ•°
 void snake_move_left()
 {
-
 }
 
 
-
-
-
-
-
-
-
-
-
-
-//*****************Ìø×ª¹â±êÖÁÖ¸¶¨Î»ÖÃ*****************
+//*****************è·³è½¬å…‰æ ‡è‡³æŒ‡å®šä½ç½®*****************
 void goto_XY(int x, int y)
 {
-	// ¸üĞÂ¹â±êÎ»ÖÃ 
+	// æ›´æ–°å…‰æ ‡ä½ç½® 
 	COORD pos;
 	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 	pos.X = x;
 	pos.Y = y;
 	SetConsoleCursorPosition(hOutput, pos);
-	// Òş²Ø¹â±ê 
+	// éšè—å…‰æ ‡ 
 	CONSOLE_CURSOR_INFO cursor;
 	cursor.bVisible = FALSE;
 	cursor.dwSize = sizeof(cursor);
 	SetConsoleCursorInfo(hOutput, &cursor);
-
 }
