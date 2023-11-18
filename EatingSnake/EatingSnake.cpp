@@ -1,4 +1,6 @@
-﻿#include "stdio.h"
+//	NanodAaa 2021/12/24
+
+#include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
 #include "conio.h"
@@ -6,24 +8,19 @@
 #include "time.h"
 #include "EatingSnake.h"
 
-
 //外部函数声明
 extern int SPEED;
 extern int GAMESCORE;
 extern char DIRECTION;
 extern bool deadFlag;
 
-
 bool firstFlag = TRUE;
 bool endFlag = FALSE;
-
 
 int main()
 {
 	//game_init(); //游戏初始化参数
-
 	screen_START(); //开始界面
-
 	screen_PLAY(); //游戏界面
 	snake_food_print(); //生成食物1
 	snake_born_print(); //生成蛇
@@ -50,10 +47,5 @@ int main()
 		}
 
 		Sleep(SPEED);
-
 	}
-
 }
-
-
-
