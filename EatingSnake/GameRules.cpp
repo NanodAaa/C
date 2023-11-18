@@ -1,12 +1,11 @@
 //******************************************
 //		
-//		ÓÎÏ·ÄÑ¶ÈÉèÖÃ
-//		ÄÑ¶ÈÔÚÓÎÏ·ÄÚµÄ±ä»¯
-//
+//		æ¸¸æˆéš¾åº¦è®¾ç½®
+//		éš¾åº¦åœ¨æ¸¸æˆå†…çš„å˜åŒ–
+//		NanodAaa 2023/12/24
 //******************************************
 
-
-#define _CRT_SECURE_NO_WARNINGS //Ïû³ýÎ£ÏÕ¾¯¸æ
+#define _CRT_SECURE_NO_WARNINGS //æ¶ˆé™¤å±é™©è­¦å‘Š
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -16,8 +15,7 @@
 #include "EatingSnake.h"
 #include "conio.h"
 
-
-//Íâ²¿º¯ÊýÉùÃ÷
+//å¤–éƒ¨å‡½æ•°å£°æ˜Ž
 extern int GAMESCORE;
 extern int SPEED;
 extern snake_head_position HEAD;
@@ -26,88 +24,74 @@ extern bool snakeaddFlag;
 extern bool foodFlag[3];
 extern int FOODNUMBER;
 
+char DIFFICULTY[10] = "BABY"; //å‚¨å­˜æ¸¸æˆéš¾åº¦
+bool deadFlag = FALSE;        //æ­»äº¡æ ‡å¿—
 
-char DIFFICULTY[10] = "BABY"; //´¢´æÓÎÏ·ÄÑ¶È
-bool deadFlag = FALSE;        //ËÀÍö±êÖ¾
 
-
-//ÉßÉßËÙ¶È±ä»¯
+//è›‡è›‡é€Ÿåº¦å˜åŒ–
 void snake_speed_setting()
 {
-	//¸ù¾Ýµ±Ç°ÓÎÏ··ÖÊý¸Ä±äÉßÉßËÙ¶È
+	//æ ¹æ®å½“å‰æ¸¸æˆåˆ†æ•°æ”¹å˜è›‡è›‡é€Ÿåº¦
 	if (GAMESCORE == 5)
 	{
 		SPEED = 400;
 		strcpy(DIFFICULTY, "EASY");
-
 	}
-
 	if (GAMESCORE == 10)
 	{
 		SPEED = 300;
 		strcpy(DIFFICULTY, "MODERATE");
-
 	}
-
 	if (GAMESCORE == 15)
 	{
 		SPEED = 200;
 		strcpy(DIFFICULTY, "DIFFICULT");
-
 	}
-
 	if (GAMESCORE == 20)
 	{
 		SPEED = 100;
 		strcpy(DIFFICULTY, "!!ULTRA!!");
-
 	}
-
 }
 
 
-//*****************×²Ç½ËÀÍöÅÐ¶¨*****************
+//*****************æ’žå¢™æ­»äº¡åˆ¤å®š*****************
 void snake_dead_judge()
 {
 	if (HEAD.x > 69 || HEAD.x < 22 || HEAD.y > 24 || HEAD.y < 6)
 	{
-		deadFlag = TRUE; //³¬³öÓÎÏ·½çÃæËÍ³öËÀÍö±êÖ¾
-
+		deadFlag = TRUE; //è¶…å‡ºæ¸¸æˆç•Œé¢é€å‡ºæ­»äº¡æ ‡å¿—
 	}
-
 }
 
 
-//*****************ÅÐ¶ÏÉß³Ôµ½Ê³Îï*****************
+//*****************åˆ¤æ–­è›‡åƒåˆ°é£Ÿç‰©*****************
 void snake_eat_food()
 {
-	//Éß³Ôµ½Ê³Îï¾Í´ò¿ªÊ³ÎïÉú³É´òÓ¡±êÖ¾
+	//è›‡åƒåˆ°é£Ÿç‰©å°±æ‰“å¼€é£Ÿç‰©ç”Ÿæˆæ‰“å°æ ‡å¿—
 	for (int i = 0; i < FOODNUMBER; i++)
 	{
-		//ÅÐ¶ÏÉßÉß³Ôµ½Ê³Îï
+		//åˆ¤æ–­è›‡è›‡åƒåˆ°é£Ÿç‰©
 		if (HEAD.x == FOOD[i].x && HEAD.y == FOOD[i].y)
 		{
-			foodFlag[i] = TRUE; //ËÍ³öÊ³Îï i ´òÓ¡±êÖ¾
+			foodFlag[i] = TRUE; //é€å‡ºé£Ÿç‰© i æ‰“å°æ ‡å¿—
 
-			GAMESCORE++;        //µÃ·Ö +1
-			snakeaddFlag = TRUE; //ËÍ³öÉßÉßÔö³¤±êÖ¾
+			GAMESCORE++;        //å¾—åˆ† +1
+			snakeaddFlag = TRUE; //é€å‡ºè›‡è›‡å¢žé•¿æ ‡å¿—
 			
-			//ÖØÐÂ´òÓ¡³ÔµôµÄÊ³Îï
+			//é‡æ–°æ‰“å°åƒæŽ‰çš„é£Ÿç‰©
 			snake_food_refresh(i); 
 			snake_food_print();
-
 		}
-
 	}
-
 }
 
 
-//*****************ÓÎÏ·¹æÔò*****************
+//*****************æ¸¸æˆè§„åˆ™*****************
 void GAMERULE()
 {
-	snake_dead_judge(); //ËÀÍöÅÐ¶¨
-	snake_eat_food(); //³Ôµ½Ê³ÎïÅÐ¶¨
-	snake_lenth_add(); //ÉßÉßÔö³¤ÅÐ¶¨
+	snake_dead_judge(); //æ­»äº¡åˆ¤å®š
+	snake_eat_food(); //åƒåˆ°é£Ÿç‰©åˆ¤å®š
+	snake_lenth_add(); //è›‡è›‡å¢žé•¿åˆ¤å®š
 
 }
