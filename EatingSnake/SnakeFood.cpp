@@ -1,10 +1,9 @@
 //******************************************
 //		
-//		Ê³ÎïµÄ´´½¨¼°
-//		ÉßÓëÊ³ÎïµÄ»¥¶¯
-//
+//		é£Ÿç‰©çš„åˆ›å»ºåŠ
+//		è›‡ä¸é£Ÿç‰©çš„äº’åŠ¨
+//		NanodAaa 2023/12/24
 //******************************************
-
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -14,59 +13,52 @@
 #include "EatingSnake.h"
 #include "conio.h"
 
-#define FOOD1P printf("$");  //´òÓ¡¡°Ê³Îï¡±
+#define FOOD1P printf("$");  //æ‰“å°â€œé£Ÿç‰©â€
 #define FOOD2P printf("&");
 #define FOOD3P printf("#");
 
-
-//Íâ²¿º¯ÊıÉùÃ÷
+//å¤–éƒ¨å‡½æ•°å£°æ˜
 extern snake_head_position HEAD;
 extern int GAMESCORE;
 extern bool snakeaddFlag;
 
+bool foodFlag[3] = {TRUE, FALSE, FALSE};  //å¼€å§‹ç”Ÿæˆé£Ÿç‰©ä½ç½®å¹¶æ‰“å°çš„æ ‡å¿—
+int FOODNUMBER = 1;   //åŒæ—¶å­˜åœ¨çš„é£Ÿç‰©æ•°é‡ï¼Œåˆå§‹ä¸º 1ï¼Œ æœ€å¤§ä¸º3ï¼Œä¾æ®éš¾åº¦è°ƒæ•´
 
-bool foodFlag[3] = {TRUE, FALSE, FALSE};  //¿ªÊ¼Éú³ÉÊ³ÎïÎ»ÖÃ²¢´òÓ¡µÄ±êÖ¾
-int FOODNUMBER = 1;   //Í¬Ê±´æÔÚµÄÊ³ÎïÊıÁ¿£¬³õÊ¼Îª 1£¬ ×î´óÎª3£¬ÒÀ¾İÄÑ¶Èµ÷Õû
-
-snake_food_position FOOD[3] = { 50, 15 }; //´¢´æÊ³Îï×ø±ê£¬Ê³Îï1³õÊ¼×ø±êÎª {x=50, y=15}
+snake_food_position FOOD[3] = { 50, 15 }; //å‚¨å­˜é£Ÿç‰©åæ ‡ï¼Œé£Ÿç‰©1åˆå§‹åæ ‡ä¸º {x=50, y=15}
 
 
-//*****************Ëæ»úÉú³ÉÊ³ÎïÎ»ÖÃ*****************
+//*****************éšæœºç”Ÿæˆé£Ÿç‰©ä½ç½®*****************
 void snake_food_refresh(int i)
 {
 	srand((int)time(NULL));
 	FOOD[i].x = rand() % 53 + 20;
 
 	srand((int)time(NULL));
-	FOOD[i].y = rand() % 21 + 5;
-	
+	FOOD[i].y = rand() % 21 + 5;	
 }
 
 
-//*****************´òÓ¡Ê³Îï*****************
+//*****************æ‰“å°é£Ÿç‰©*****************
 void snake_food_print()
 {
-	//¸ù¾İÊ³Îï´òÓ¡±êÖ¾´òÓ¡Ê³Îï
+	//æ ¹æ®é£Ÿç‰©æ‰“å°æ ‡å¿—æ‰“å°é£Ÿç‰©
 	if (foodFlag[0] == TRUE)
 	{
 		goto_XY(FOOD[0].x, FOOD[0].y);
 		FOOD1P;
 		foodFlag[0] = FALSE;
-
 	}
 
 	if (foodFlag[1] == TRUE)
 	{
 		goto_XY(FOOD[1].x, FOOD[1].y);
 		FOOD2P;
-
 	}
 
 	if (foodFlag[2] == TRUE)
 	{
 		goto_XY(FOOD[2].x, FOOD[2].y);
 		FOOD3P;
-
 	}
-
 }
